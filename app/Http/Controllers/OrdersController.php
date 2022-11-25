@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Food;
+use App\Models\Order;
 
-class FoodController extends Controller
+class OrdersController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,8 +14,8 @@ class FoodController extends Controller
      */
     public function index()
     {
-        $food = Food::all();
-        return $food;
+        $order = Order::all();
+        return $order;
     }
 
     /**
@@ -36,16 +36,17 @@ class FoodController extends Controller
      */
     public function store(Request $request)
     {
-        $table = Food::create([
-            "name" => $request->name,
-            "description" => $request->description,
-            "price" => $request->price,
-            "picture" => $request->picture
+        $table = Order::create([
+            "order_address" => $request->order_address,
+            "order_amount" => $request->order_amount,
+            "payment_method" => $request->payment_method,
+            "date" => $request->date,
+            "total_amount" => $request->total_amount,
         ]);
 
         return response()->json([
             'success' => 201,
-            'message' => 'Food saved successfully',
+            'message' => 'Order saved successfully',
             'data' => $table
         ], 201);
     }
@@ -58,11 +59,11 @@ class FoodController extends Controller
      */
     public function show($id)
     {
-        $food = Food::find($id);
-        if ($food) {
+        $order = Order::find($id);
+        if ($order) {
             return response()->json([
                 'status' => 200,
-                'data' => $food
+                'data' => $order
             ], 200);
         } else {
             return response()->json([
@@ -92,16 +93,17 @@ class FoodController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $food = Food::find($id);
-        if($food){
-            $food->name = $request->name ? $request->name : $food->name;
-            $food->description = $request->description ? $request->description : $food->description;
-            $food->price = $request->price ? $request->price : $food->price;
-            $food->picture = $request->picture ? $request->picture : $food->picture;
-            $food->save();
+        $order = Order::find($id);
+        if($order){
+            $order->order_address = $request->order_address ? $request->order_address : $order->order_address;
+            $order->order_amount = $request->order_amount ? $request->order_amount : $order->order_amount;
+            $order->payment_method = $request->payment_method ? $request->payment_method : $order->payment_method;
+            $order->date = $request->date ? $request->date : $order->date;
+            $order->total_amount = $request->total_amount ? $request->total_amount : $order->total_amount;
+            $order->save();
             return response()->json([
                 'status' => 200,
-                'data' => $food
+                'data' => $order
             ],200);
         } else {
             return response()->json([
@@ -119,12 +121,12 @@ class FoodController extends Controller
      */
     public function destroy($id)
     {
-        $food = food::where('id',$id)->first();
-        if($food){
-            $food->delete();
+        $order = Order::where('id',$id)->first();
+        if($order){
+            $order->delete();
             return response()->json([
                 'status' =>200,
-                'data'=> $food
+                'data'=> $order
             ],200);
         }else{
             return response()->json([

@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FoodController;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\OrdersController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +23,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 //Route for foods
 Route::resource('/foods', FoodController::class)->except(
+    ['create','edit']
+);
+
+//Route for orders
+Route::resource('/orders', OrdersController::class)->except(
     ['create','edit']
 );
 
