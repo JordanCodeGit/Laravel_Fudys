@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FoodController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\OrdersController;
+use App\Http\Controllers\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,12 +24,17 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 //Route for foods
 Route::resource('/foods', FoodController::class)->except(
-    ['create','edit']
+    ['create','edit','update','delete']
 );
 
 //Route for orders
 Route::resource('/orders', OrdersController::class)->except(
-    ['create','edit']
+    ['create','edit','delete']
+);
+
+//Route for payments
+Route::resource('/payments', PaymentController::class)->except(
+    ['create','edit','update','destroy']
 );
 
 //Route for registering & logging in
@@ -38,4 +44,10 @@ Route::post('/login', [AccountController::class, 'login']);
 //Private routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AccountController::class, 'logout']);
+    Route::resource('/foods', FoodController::class)->except(
+        'index','create','show','edit');
+    Route::resource('/orders', OrdersController::class)->except(
+        'index','create','update','store','destroy');
+        Route::resource('/foods', PaymentController::class)->except(
+            'index','create','edit','store','update','destroy');
 });
