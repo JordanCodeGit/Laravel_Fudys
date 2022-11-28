@@ -36,6 +36,16 @@ class FoodController extends Controller
      */
     public function store(Request $request)
     {
+        $user = auth()->user();
+
+        if ($user->role == 'admin') {
+            $request->validate([
+                "name" => 'required',
+                "description" => 'required',
+                "price" => 'required',
+                "picture" => 'required'
+            ]);
+
         $table = Food::create([
             "name" => $request->name,
             "description" => $request->description,
@@ -48,7 +58,13 @@ class FoodController extends Controller
             'message' => 'Food saved successfully',
             'data' => $table
         ], 201);
+    } else {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'You dont have access to this.',
+        ], 401);
     }
+}
 
     /**
      * Display the specified resource.
@@ -92,23 +108,35 @@ class FoodController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $food = Food::find($id);
-        if($food){
-            $food->name = $request->name ? $request->name : $food->name;
-            $food->description = $request->description ? $request->description : $food->description;
-            $food->price = $request->price ? $request->price : $food->price;
-            $food->picture = $request->picture ? $request->picture : $food->picture;
-            $food->save();
-            return response()->json([
-                'status' => 200,
+        $user = auth()->user();
+        if ($user->role == 'admin') {
+            $request->validate([
+                "name" => 'required',
+                "description" => 'required',
+                "price" => 'required',
+                "picture" => 'required'
+            ]);
+
+            $food = Food::find($id);
+
+            $food->update([
+                "name" => $request->name,
+                "description" => $request->description,
+                "price" => $request->price,
+                "picture" => $request->picture
+            ]);
+
+             return response()->json([
+                'status' =>'success',
+                'message' => 'Food successfully updated',
                 'data' => $food
-            ],200);
+            ], 201);
         } else {
             return response()->json([
-                'status'=>404,
-                'message'=> $id . ' not found'
-            ],404);
-        }
+                'status' =>'error',
+                'message' => 'You dont have access to update food',
+            ], 401);
+        }    
     }
 
     /**
@@ -119,18 +147,21 @@ class FoodController extends Controller
      */
     public function destroy($id)
     {
-        $food = food::where('id',$id)->first();
-        if($food){
+        $user = auth()->user();
+        if ($user->role == 'admin') {
+            $food = Food::find($id);
             $food->delete();
+
             return response()->json([
-                'status' =>200,
-                'data'=> $food
-            ],200);
-        }else{
+                'status' => 'success',
+                'message' => 'food successfully erased',
+
+            ], 200);
+        } else{
             return response()->json([
-                'status' => 404,
-                'message' => 'ID' . $id . ' not found'
-            ],404);
+                'status' =>'error',
+                'message' => 'You dont have access to erase food',
+            ], 401);
         }
     }
 }

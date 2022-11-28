@@ -15,7 +15,11 @@ class OrdersController extends Controller
     public function index()
     {
         $order = Order::all();
-        return $order;
+
+        return response()->json([
+            'message' => 'Orders successfully shown',
+            'data' => $order
+        ], 200);
     }
 
     /**
@@ -36,19 +40,36 @@ class OrdersController extends Controller
      */
     public function store(Request $request)
     {
-        $table = Order::create([
-            "order_address" => $request->order_address,
-            "order_amount" => $request->order_amount,
-            "payment_method" => $request->payment_method,
-            "date" => $request->date,
-            "total_amount" => $request->total_amount,
-        ]);
+        $user = auth()->user();
+        if($user->role == 'user') 
+        {
+            $request->validate([
+            'order_address' => 'required',
+            'order_amount' => 'required',
+            'payment_method'=> 'required',
+            'date' => 'required',
+            'total_amount'=> 'required'
+            ]);
 
-        return response()->json([
-            'success' => 201,
-            'message' => 'Order saved successfully',
-            'data' => $table
-        ], 201);
+            $order = Order::create([
+                "order_address" => $request->order_address,
+                "order_amount" => $request->order_amount,
+                "payment_method" => $request->payment_method,
+                "date" => $request->date,
+                "total_amount" => $request->total_amount  
+            ]);
+
+            return response()->json([
+                'status' =>'success',
+                'message' => 'Order successfully added',
+                'data' => $order
+            ], 201);
+        } else {
+            return response()->json([
+                'status' =>'error',
+                'message' => 'You dont have access to place an order',
+            ], 401);
+        }    
     }
 
     /**
