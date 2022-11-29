@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\Food;
 
 class OrdersController extends Controller
 {
@@ -41,6 +42,10 @@ class OrdersController extends Controller
     public function store(Request $request)
     {
         $user = auth()->user();
+
+        $food = Food::where('id', $request->food_id)->first();
+        
+
         if($user->role == 'user') 
         {
             $request->validate([
@@ -48,7 +53,7 @@ class OrdersController extends Controller
             'order_amount' => 'required',
             'payment_method'=> 'required',
             'date' => 'required',
-            'total_amount'=> 'required'
+         
             ]);
 
             $order = Order::create([
@@ -56,7 +61,7 @@ class OrdersController extends Controller
                 "order_amount" => $request->order_amount,
                 "payment_method" => $request->payment_method,
                 "date" => $request->date,
-                "total_amount" => $request->total_amount  
+                "total_amount" => $request->order_amount * $food->price 
             ]);
 
             return response()->json([

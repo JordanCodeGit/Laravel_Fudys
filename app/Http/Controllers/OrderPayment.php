@@ -19,15 +19,25 @@ class OrderPayment extends Controller
 
     public function store(Request $request)
     {               
-            $order = Payment::create([
-                'date' => $request->date,
-                'id_payment' => $request->id_payment,
-                'id_order' => $request->id_order,
-                'total' => $request->total,
-                'bayar' => $request->bayar,
-                'kembali' => $request->bayar - $request->total,
-                'status' => 'pending',
-            ]);
+           
+
+            if($request->bayar < $request->total)
+            {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'You dont have enough money???',
+                ], 200);
+            }else{
+                $order = Payment::create([
+                    'date' => $request->date,
+                    'id_payment' => $request->id_payment,
+                    'id_order' => $request->id_order,
+                    'total' => $request->total,
+                    'bayar' => $request->bayar,
+                    'kembali' => $request->bayar - $request->total,
+                    'status' => 'pending',
+                ]);
+            }
 
             return response()->json([
                 'status' => 'success',
